@@ -32,7 +32,8 @@ executor.runGame(new MCTS(), ghosts, speed);
 executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
 ```
 
-You can just uncomment and run the code to whichever algorithm that you wanted to try with! Below is the screenshot of the highest score of our implementation:
+You can just uncomment and run the code to whichever algorithm that you wanted to try with! Below is the screenshot of the highest score of our implementation: 
+
 <img src="Our_highest_score.png" width="200">
 
 
