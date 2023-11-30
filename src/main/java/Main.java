@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.EnumMap;
 
 import examples.StarterPacMan.AStarSearch.AStarSearchPacMan;
+import examples.StarterPacMan.GeneticAlgorithm.EvolvedPacMan;
+import examples.StarterPacMan.MCTS.MCTS;
 
 
 /**
