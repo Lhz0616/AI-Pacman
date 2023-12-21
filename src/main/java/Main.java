@@ -1,13 +1,14 @@
 import examples.StarterGhostComm.Blinky;
+import examples.StarterGhostComm.DisperseGhosts;
 import examples.StarterGhostComm.Inky;
+import examples.StarterGhostComm.POCommGhosts;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
 import pacman.Executor;
-import pacman.controllers.Controller;
+
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
-import pacman.controllers.examples.StarterGhosts;
-import pacman.controllers.examples.po.POCommGhosts;
+
 import pacman.game.Constants.*;
 import pacman.game.internal.POType;
 
@@ -31,7 +32,7 @@ public class Main {
         Executor executor = new Executor.Builder()
                 .setVisual(true)
                 .setPacmanPO(false)
-                .setTickLimit(20000)
+                .setTickLimit(40000)
                 .setScaleFactor(2) // Increase game visual size
                 .setPOType(POType.RADIUS) // pacman sense objects around it in a radius wide fashion instead of straight line sights
                 .setSightLimit(sightRadius) // The sight radius limit, set to maximum 
@@ -46,17 +47,17 @@ public class Main {
         
         int speed = 1; // smaller number will run faster
         
-        MASController ghosts = new POCommGhosts(50);
-        Controller<EnumMap<GHOST, MOVE>> ghost_in = new StarterGhosts();
+        MASController ghosts = new DisperseGhosts(50);
+        // MASController ghosts = new POCommGhosts(50);
 
         // A star search algorithm 
-        executor.runGame(new AStarSearchPacMan(ghost_in), ghosts, speed);
+        // executor.runGame(new AStarSearchPacMan(ghosts), ghosts, speed);
 
         // MCTS Algorithm
         // executor.runGame(new MCTS(), ghosts, speed);
 
         // Genetic Algorithm
-        // executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
+        executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
                 
     }
 }

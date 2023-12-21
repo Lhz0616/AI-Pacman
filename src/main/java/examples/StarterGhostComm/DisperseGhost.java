@@ -2,38 +2,35 @@ package examples.StarterGhostComm;
 
 import pacman.controllers.IndividualGhostController;
 import pacman.game.Constants;
+import pacman.game.Constants.DM;
+import pacman.game.Constants.GHOST;
+import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 import pacman.game.comms.BasicMessage;
 import pacman.game.comms.Message;
 import pacman.game.comms.Messenger;
 
-import java.util.Random;
+public class DisperseGhost extends IndividualGhostController{
+    private static final int CROWDED_DISTANCE = 30;
+    private static final int PACMAN_DISTANCE = 10;
+    private static final int PILL_PROXIMITY = 15;
 
-
-/**
- * Created by pwillic on 25/02/2016.
- */
-
-public class POCommGhost extends IndividualGhostController {
-    private final static float CONSISTENCY = 0.9f;    //attack Ms Pac-Man with this probability
-    private final static int PILL_PROXIMITY = 15;        //if Ms Pac-Man is this close to a power pill, back away
-    Random rnd = new Random();
     private int TICK_THRESHOLD;
     private int lastPacmanIndex = -1;
     private int tickSeen = -1;
     public static int lastRecordGhostEaten = 0;
 
-    public POCommGhost(Constants.GHOST ghost) {
-        this(ghost, 5);
+    public DisperseGhost(GHOST ghost) {
+        super(ghost);
     }
 
-    public POCommGhost(Constants.GHOST ghost, int TICK_THRESHOLD) {
+    public DisperseGhost(Constants.GHOST ghost, int TICK_THRESHOLD) {
         super(ghost);
         this.TICK_THRESHOLD = TICK_THRESHOLD;
-    }
+    } 
 
     @Override
-    public Constants.MOVE getMove(Game game, long timeDue) {
+    public MOVE getMove(Game game, long timeDue) {
         // Housekeeping - throw out old info
         int currentTick = game.getCurrentLevelTime();
         if (currentTick <= 2 || currentTick - tickSeen >= TICK_THRESHOLD) {
@@ -76,32 +73,17 @@ public class POCommGhost extends IndividualGhostController {
         Boolean requiresAction = game.doesGhostRequireAction(ghost);
         if (requiresAction != null && requiresAction)        //if ghost requires an action
         {
-            if (pacmanIndex != -1) {
-                if (game.getGhostEdibleTime(ghost) > 0 || closeToPower(game))    //retreat from Ms Pac-Man if edible or if Ms Pac-Man is close to power pill
-                {
-                    try {
-                        return game.getApproximateNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
-                                game.getPacmanCurrentNodeIndex(), game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        System.out.println(e);
-                        System.out.println(pacmanIndex + " : " + currentIndex);
-                    }
-                } else {
-                    if (rnd.nextFloat() < CONSISTENCY) {            //attack Ms Pac-Man otherwise (with certain probability)
-                        try {
-                            Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
-                                    pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
-                            return move;
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            System.out.println(e);
-                            System.out.println(pacmanIndex + " : " + currentIndex);
-                        }
-                    }
-                }
-            } else {
-                Constants.MOVE[] possibleMoves = game.getPossibleMoves(game.getGhostCurrentNodeIndex(ghost), game.getGhostLastMoveMade(ghost));
-                return possibleMoves[rnd.nextInt(possibleMoves.length)];
-            }
+            // if ghost is crowded and not close to pacman, disperse
+            if(isCrowded(game) && !closeToMsPacman(game, currentIndex))
+                return getRetreatActions(game);
+
+            // if edible or Ms Pacman is close to powerpill, move away from Ms Pacman
+            else if(game.getGhostEdibleTime(ghost) > 0 || closeToPower(game))
+                return game.getApproximateNextMoveAwayFromTarget(currentIndex, pacmanIndex, game.getGhostLastMoveMade(ghost),DM.PATH);
+
+            // else go towards Ms pacman
+            else
+                return game.getApproximateNextMoveTowardsTarget(currentIndex, pacmanIndex, game.getGhostLastMoveMade(ghost),DM.PATH);
         }
         return null;
     }
@@ -109,10 +91,10 @@ public class POCommGhost extends IndividualGhostController {
     //This helper function checks if Ms Pac-Man is close to an available power pill
     private boolean closeToPower(Game game) {
         int[] powerPills = game.getPowerPillIndices();
+        int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
 
         for (int i = 0; i < powerPills.length; i++) {
             Boolean powerPillStillAvailable = game.isPowerPillStillAvailable(i);
-            int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
             if (pacmanNodeIndex == -1) {
                 pacmanNodeIndex = lastPacmanIndex;
             }
@@ -126,4 +108,38 @@ public class POCommGhost extends IndividualGhostController {
 
         return false;
     }
+    
+    private boolean closeToMsPacman(Game game, int location){
+        if(game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), location) < PACMAN_DISTANCE)
+            return true;
+        
+        return false;
+    }
+
+    private boolean isCrowded(Game game){
+        float distance = 0;
+        GHOST[] ghosts = GHOST.values(); 
+
+        for(int i = 0; i<ghosts.length - 1; i++){
+            for(int j = i+1; j<ghosts.length; j++)
+                distance += game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghosts[i]), game.getGhostCurrentNodeIndex(ghosts[j]));
+        }
+
+        return (distance/6) < CROWDED_DISTANCE ? true : false;
+    }
+
+    private MOVE getRetreatActions(Game game){
+        int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
+
+        if(game.getGhostEdibleTime(ghost) == 0 && game.getShortestPathDistance(ghostIndex, game.getPacmanCurrentNodeIndex()) < PACMAN_DISTANCE)
+            return game.getApproximateNextMoveTowardsTarget(ghostIndex, game.getPacmanCurrentNodeIndex(), game.getGhostLastMoveMade(ghost), DM.PATH);
+        
+
+        else{
+
+            return game.getApproximateNextMoveTowardsTarget(ghostIndex, game.getPowerPillIndices()[ghost.ordinal()], game.getGhostLastMoveMade(ghost), DM.PATH);
+        }
+        
+    }
+
 }
