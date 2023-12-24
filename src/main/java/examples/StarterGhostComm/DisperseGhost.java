@@ -12,7 +12,7 @@ import pacman.game.comms.Messenger;
 
 public class DisperseGhost extends IndividualGhostController{
     private static final int CROWDED_DISTANCE = 30;
-    private static final int PACMAN_DISTANCE = 10;
+    private static final int PACMAN_DISTANCE = 15;
     private static final int PILL_PROXIMITY = 15;
 
     private int TICK_THRESHOLD;
