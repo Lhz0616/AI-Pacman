@@ -51,13 +51,13 @@ public class Main {
         // MASController ghosts = new POCommGhosts(50);
 
         // A star search algorithm 
-        executor.runGame(new AStarSearchPacMan(ghosts), ghosts, speed);
+        //executor.runGame(new AStarSearchPacMan(ghosts), ghosts, speed);
 
         // MCTS Algorithm
         // executor.runGame(new MCTS(), ghosts, speed);
 
         // Genetic Algorithm
-        // executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
+         executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
                 
     }
 }

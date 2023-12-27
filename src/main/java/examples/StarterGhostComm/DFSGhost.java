@@ -8,12 +8,13 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
 public class DFSGhost extends IndividualGhostController {
-    private static final int PACMAN_DISTANCE = 15;
-    private static final int PILL_PROXIMITY = 15;
-
     private final Constants.GHOST ghost;
-
     public DFSGhost(Constants.GHOST ghost) {
+        super(ghost);
+        this.ghost = ghost;
+    }
+
+    public DFSGhost(Constants.GHOST ghost, int TICK_THRESHOLD) {
         super(ghost);
         this.ghost = ghost;
     }
@@ -49,31 +50,5 @@ public class DFSGhost extends IndividualGhostController {
         }
 
         return MOVE.NEUTRAL; // No path found or other conditions, return a default move
-    }
-
-    // Helper methods for distance calculation, proximity checks, etc.
-    private boolean closeToPower(Game game) {
-        int[] powerPills = game.getPowerPillIndices();
-        int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
-
-        for (int powerPillIndex : powerPills) {
-            Boolean powerPillStillAvailable = game.isPowerPillStillAvailable(powerPillIndex);
-
-            if (powerPillStillAvailable != null && powerPillStillAvailable) {
-                int distance = game.getShortestPathDistance(powerPillIndex, pacmanNodeIndex);
-                if (distance != -1 && distance < PILL_PROXIMITY) {
-                    return true; // Found a power pill close to Ms. Pac-Man
-                }
-            }
-        }
-
-        return false; // No power pill close to Ms. Pac-Man
-    }
-
-    private boolean closeToMsPacman(Game game, int location) {
-        int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
-        int distance = game.getShortestPathDistance(pacmanNodeIndex, location);
-
-        return distance != -1 && distance < PACMAN_DISTANCE;
     }
 }
