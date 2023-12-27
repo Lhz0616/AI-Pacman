@@ -9,13 +9,8 @@ import pacman.game.Game;
 
 public class DFSGhost extends IndividualGhostController {
     private final Constants.GHOST ghost;
-    private static final int PACMAN_DISTANCE = 15;
-    private static final int PILL_PROXIMITY = 15;
-
-    public DFSGhost(Constants.GHOST ghost) {
-        super(ghost);
-        this.ghost = ghost;
-    }
+    private static int PACMAN_DISTANCE = 15;
+    private static int PILL_PROXIMITY = 15;
 
     public DFSGhost(Constants.GHOST ghost, int TICK_THRESHOLD) {
         super(ghost);
@@ -31,6 +26,15 @@ public class DFSGhost extends IndividualGhostController {
         int currentIndex = game.getGhostCurrentNodeIndex(ghost);
         int pacmanIndex = game.getPacmanCurrentNodeIndex();
 
+        // Dynamic adjustment of thresholds based on game state
+        if (game.isGhostEdible(ghost)) {
+            PACMAN_DISTANCE = 20; // Increase distance threshold when ghost is edible
+            PILL_PROXIMITY = 20; // Increase proximity threshold when ghost is edible
+        } else {
+            PACMAN_DISTANCE = 15; // Reset distance threshold when ghost is not edible
+            PILL_PROXIMITY = 15; // Reset proximity threshold when ghost is not edible
+        }
+        
         HashSet<Integer> visited = new HashSet<>(); // To track visited nodes
         Stack<Integer> stack = new Stack<>(); // Stack for DFS exploration
         stack.push(currentIndex);
@@ -52,44 +56,39 @@ public class DFSGhost extends IndividualGhostController {
             }
         }
 
-        if (closeToPower(game)) {
-            // Perform an action when close to a power pill
-            // For example, move away from Ms. Pac-Man
+        // No direct path to Pac-Man found, apply other strategies
+        if (closeToPower(game, pacmanIndex)) {
+            // Move away from Ms. Pac-Man if close to a power pill
             return game.getNextMoveAwayFromTarget(currentIndex, pacmanIndex, Constants.DM.PATH);
         }
         
-        if (closeToMsPacman(game, currentIndex)) {
-            // Perform an action when close to Ms. Pac-Man
-            // For example, move towards Ms. Pac-Man
+        if (closeToMsPacman(game, currentIndex, pacmanIndex)) {
+            // Move towards Ms. Pac-Man if within a certain distance
             return game.getNextMoveTowardsTarget(currentIndex, pacmanIndex, Constants.DM.PATH);
         }
 
-        return MOVE.NEUTRAL; // No path found or other conditions, return a default move
+        return MOVE.NEUTRAL; // No immediate path found, return a default move
     }
 
     // Helper methods for distance calculation, proximity checks, etc.
-    private boolean closeToPower(Game game) {
-        int[] powerPills = game.getPowerPillIndices();
-        int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
-
+    private boolean closeToPower(Game game, int pacmanIndex) {
+        int[] powerPills = game.getActivePowerPillsIndices(); // Get active power pills
+    
         for (int powerPillIndex : powerPills) {
-            Boolean powerPillStillAvailable = game.isPowerPillStillAvailable(powerPillIndex);
-
-            if (powerPillStillAvailable != null && powerPillStillAvailable) {
-                int distance = game.getShortestPathDistance(powerPillIndex, pacmanNodeIndex);
-                if (distance != -1 && distance < PILL_PROXIMITY) {
-                    return true; // Found a power pill close to Ms. Pac-Man
-                }
+            int distance = game.getShortestPathDistance(powerPillIndex, pacmanIndex);
+    
+            if (distance != -1 && distance < PILL_PROXIMITY) {
+                return true; // Found a power pill close to Ms. Pac-Man
             }
         }
-
+    
         return false; // No power pill close to Ms. Pac-Man
     }
+    
 
-    private boolean closeToMsPacman(Game game, int location) {
-        int pacmanNodeIndex = game.getPacmanCurrentNodeIndex();
-        int distance = game.getShortestPathDistance(pacmanNodeIndex, location);
-
+    private boolean closeToMsPacman(Game game, int location, int pacmanIndex) {
+        int distance = game.getShortestPathDistance(pacmanIndex, location);
         return distance != -1 && distance < PACMAN_DISTANCE;
     }
+    
 }
