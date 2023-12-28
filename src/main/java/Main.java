@@ -1,14 +1,11 @@
-<<<<<<< HEAD
 import examples.StarterGhostComm.Blinky;
 import examples.StarterGhostComm.DisperseGhosts;
 import examples.StarterGhostComm.Inky;
 import examples.StarterGhostComm.POCommGhosts;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
-=======
+
 import examples.StarterGhostComm.*;
-import pacman.Executor;
->>>>>>> 58c52cd2d5731f7f6533ebf7e1be6fdcf36d9db3
 
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
