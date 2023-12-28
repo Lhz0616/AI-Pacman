@@ -5,7 +5,7 @@ import pacman.game.Constants;
 /**
  * Created by Piers on 11/11/2015.
  */
-public class Blinky extends DisperseGhost {
+public class Blinky extends POCommGhost {
 
 
     public Blinky() {
