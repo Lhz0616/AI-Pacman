@@ -1,9 +1,4 @@
-import examples.StarterGhostComm.Blinky;
-import examples.StarterGhostComm.DisperseGhosts;
-import examples.StarterGhostComm.Inky;
-import examples.StarterGhostComm.POCommGhosts;
-import examples.StarterGhostComm.Pinky;
-import examples.StarterGhostComm.Sue;
+import examples.StarterGhostComm.*;
 import pacman.Executor;
 
 import pacman.controllers.IndividualGhostController;
@@ -47,14 +42,15 @@ public class Main {
         
         int speed = 1; // smaller number will run faster
         
-        MASController ghosts = new DisperseGhosts(50);
-        // MASController ghosts = new POCommGhosts(50);
+//        MASController ghosts = new DisperseGhosts(50);
+//        MASController ghosts = new POCommGhosts(50);
+        MASController ghosts = new DFSGhosts(50);
 
         // A star search algorithm 
          executor.runGame(new AStarSearchPacMan(ghosts), ghosts, speed);
 
         // MCTS Algorithm
-        // executor.runGame(new MCTS(), ghosts, speed);
+//         executor.runGame(new MCTS(), ghosts, speed);
 
         // Genetic Algorithm
         // executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);

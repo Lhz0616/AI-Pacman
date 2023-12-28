@@ -12,6 +12,8 @@ public class DFSGhost extends IndividualGhostController {
     private static int PACMAN_DISTANCE = 15;
     private static int PILL_PROXIMITY = 15;
 
+    public static int lastRecordGhostEaten = 0;
+
     public DFSGhost(Constants.GHOST ghost, int TICK_THRESHOLD) {
         super(ghost);
         this.ghost = ghost;
@@ -41,8 +43,11 @@ public class DFSGhost extends IndividualGhostController {
 
         while (!stack.isEmpty()) {
             int currentNode = stack.pop();
-
             if (currentNode == pacmanIndex) {
+                if(game.getGhostEdibleTime(ghost) > 0) {
+//                    System.out.println("away");
+                    return game.getApproximateNextMoveAwayFromTarget(currentIndex, pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
+                }
                 return game.getNextMoveTowardsTarget(currentIndex, currentNode, Constants.DM.PATH); // Return the move towards Pac-Man
             }
 
@@ -61,12 +66,15 @@ public class DFSGhost extends IndividualGhostController {
             // Move away from Ms. Pac-Man if close to a power pill
             return game.getNextMoveAwayFromTarget(currentIndex, pacmanIndex, Constants.DM.PATH);
         }
-        
+
         if (closeToMsPacman(game, currentIndex, pacmanIndex)) {
             // Move towards Ms. Pac-Man if within a certain distance
             return game.getNextMoveTowardsTarget(currentIndex, pacmanIndex, Constants.DM.PATH);
         }
-
+        if(game.wasGhostEaten(ghost)){
+            lastRecordGhostEaten ++;
+            System.out.println("Ghost Eaten: " + lastRecordGhostEaten);
+        }
         return MOVE.NEUTRAL; // No immediate path found, return a default move
     }
 
