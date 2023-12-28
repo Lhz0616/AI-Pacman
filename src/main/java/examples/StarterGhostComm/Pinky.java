@@ -7,6 +7,7 @@ import pacman.game.Constants;
  */
 
 public class Pinky extends DFSGhost {
+// public class Pinky extends DisperseGhost{
     public Pinky() {
         super(Constants.GHOST.PINKY, 50);
     }

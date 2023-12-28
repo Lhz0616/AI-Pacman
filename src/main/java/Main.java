@@ -51,6 +51,14 @@ public class Main {
         
         int speed = 1; // smaller number will run faster
         
+        /*
+         * If DisperseGhosts is run,
+         * remember to change the ghosts class to extend DisperseGhost
+         * 
+         * Same goes to DFSGhosts
+         * Extend DFSGhost
+         * 
+         */
 //        MASController ghosts = new DisperseGhosts(50);
 //        MASController ghosts = new POCommGhosts(50);
         MASController ghosts = new DFSGhosts(50);
@@ -62,7 +70,7 @@ public class Main {
 //         executor.runGame(new MCTS(), ghosts, speed);
 
         // Genetic Algorithm
-        executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
+        // executor.runGame(new EvolvedPacMan("bestGene.txt"), ghosts, speed);
                 
     }
 }
