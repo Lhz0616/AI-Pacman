@@ -4,6 +4,11 @@ import examples.StarterGhostComm.Inky;
 import examples.StarterGhostComm.POCommGhosts;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
+<<<<<<< HEAD
+=======
+
+import examples.StarterGhostComm.*;
+>>>>>>> 974f0ae49ccfdea469b908645f26b0068b365a8c
 
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
